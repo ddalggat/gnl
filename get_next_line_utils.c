@@ -51,12 +51,6 @@ char	*ft_strdup(const char *s1)
 	return (s2);
 }
 
-// void	ft_bzero(char *s, int n)
-// {
-// 	while (n > 0)
-// 		s[--n] = '\0';
-// }
-
 char	*ft_calloc_V2(int count)
 {
 	char	*str;

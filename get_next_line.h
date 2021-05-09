@@ -12,6 +12,6 @@ char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *str);
 char	*ft_calloc_V2(int count);
 char	*ft_strchr(const char *s, int c);
-void	ft_bzero(char *s, int n); 
+char	*ft_strdup(const char *s1);
 
 #endif 
