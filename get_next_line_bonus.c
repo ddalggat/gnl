@@ -1,4 +1,4 @@
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_strcpy(char *dest, char *src)
 {
@@ -14,24 +14,35 @@ char	*ft_strcpy(char *dest, char *src)
 	return (dest);
 }
 
-char	*ft_check_tail(char **tail, char **line)
+void	new_tail(char *mark, char *mark2, char **tail, int fd)
+{
+	if (mark)
+	{
+		*mark = '\0';
+		mark2 = tail[fd];
+		tail[fd] = ft_strdup(++mark);
+		free(mark2);
+	}
+}
+
+char	*ft_check_tail(char **tail, char	**line, int fd)
 {
 	char	*mark;
 
 	mark = NULL;
-	if (*tail)
+	if (tail[fd])
 	{
-		mark = ft_strchr(*tail, '\n');
+		mark = ft_strchr(tail[fd], '\n');
 		if (mark)
 		{
 			*mark = '\0';
-			*line = *tail;
-			*tail = ft_strdup(++mark);
+			*line = tail[fd];
+			tail[fd] = ft_strdup(++mark);
 		}
 		else
 		{
-			*line = *tail;
-			*tail = 0;
+			*line = tail[fd];
+			tail[fd] = 0;
 		}
 	}
 	else
@@ -46,23 +57,19 @@ int	read_line(char **line, char **tail, char *buff, int fd)
 	char	*mark2;
 
 	cnt_byte = 1;
-	mark = ft_check_tail(tail, line);
+	mark = ft_check_tail(tail, line, fd);
 	while (mark == NULL && cnt_byte)
 	{
 		cnt_byte = read(fd, buff, BUFFER_SIZE);
 		buff[cnt_byte] = '\0';
 		mark = ft_strchr(buff, '\n');
-		if (mark)
-		{
-			 *mark = '\0';
-			 *tail = ft_strdup(++mark);
-		}
+		new_tail(mark, mark2, tail, fd);
 		mark2 = *line;
 		*line = ft_strjoin(*line, buff);
 		free(mark2);
 	}
 	free(buff);
-	if (*tail || cnt_byte)
+	if (tail[fd] || cnt_byte)
 		return (1);
 	return (0);
 }
@@ -70,7 +77,7 @@ int	read_line(char **line, char **tail, char *buff, int fd)
 int	get_next_line(int fd, char **line)
 {
 	char		*buff;
-	static char	*tail;
+	static char	*tail[1024];
 
 	if (fd < 0 || BUFFER_SIZE < 1 || !line)
 		return (-1);
@@ -82,7 +89,7 @@ int	get_next_line(int fd, char **line)
 		free(buff);
 		return (-1);
 	}
-	if (read_line(line, &tail, buff, fd))
+	if (read_line(line, &tail[fd], buff, fd))
 		return (1);
 	return (0);
 }
